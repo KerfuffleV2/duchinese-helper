@@ -1,8 +1,11 @@
 // ==UserScript==
 // @name        DC Helper
+// @description Unsupported extensions for DuChinese
+// @license      MIT
+// @supportURL  https://github.com/KerfuffleV2/duchinese-helper/
+// @version     0.5
 // @namespace   Violentmonkey Scripts
 // @match       https://duchinese.net/*
-// @version     0.5
 // @run-at      document-start
 // @grant       GM_setClipboard
 // @grant       GM_registerMenuCommand
@@ -12,7 +15,6 @@
 // @grant       GM_addValueChangeListener
 // @require     https://cdn.jsdelivr.net/npm/xspy@0.0.4/dist/xspy.min.js
 // @author      KerfuffleV2
-// @description Unsupported extensions for DuChinese
 // ==/UserScript==
 
 const defaultConfig = {
