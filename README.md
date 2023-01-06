@@ -50,11 +50,11 @@ Characters can be colored based on the tone of the syllable.
 
 ##### Sandhi
 
-You can enable displaying an mark below characters where a tone change occurs or is expected to occur. For example, multiple tone 3 syllables in a row.
+You can enable displaying a mark below characters where a tone change occurs or is expected to occur. For example, multiple tone 3 syllables in a row.
 
 ### Audio
 
-The extension adds a normal audio element, this allows adjusting the volume or seeking through the content directly. It is also possible to download the audio using this. The extension also add the ability to set a default volume level and playback speed.
+The extension adds a normal audio element, this allows adjusting the volume or seeking through the content directly. It is also possible to download the audio using this. The extension also adds the ability to set a default volume level and playback speed.
 
 As with the normal site interface, it is possible to click within the lesson text to seek to that part of the audio and while audio is playing the current syllable/word/sentence will be tracked.
 
