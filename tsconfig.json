@@ -1,0 +1,14 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "sourceMap": true,
+    "target": "ES2021",
+    "allowJs": true,
+    "lib": ["es2021", "dom"],
+    "module": "ES2020",
+    "incremental": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.js", "test/**/*.ts"]
+}

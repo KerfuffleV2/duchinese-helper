@@ -1,0 +1,32 @@
+{
+  "extends": "./node_modules/gts/",
+  "env": {
+    "es2022": true,
+    "browser": true,
+    "greasemonkey": true
+  },
+  "parserOptions": {"ecmaVersion": 13, "sourceType": "module"},
+  "ignorePatterns": ["build/**/*", "dist/**/*"],
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "node/no-unsupported-features/es-syntax": [
+      "error",
+      {"ignores": ["modules"]}
+    ]
+  }
+}
