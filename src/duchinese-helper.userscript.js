@@ -463,7 +463,11 @@ class Vocabulary {
           return `HSK ${idx + 1}`;
       }
     }
+    const vocabThreshold = (configuration.get('vocabHskThreshold') ?? 1) - 1;
     this.hskWords.forEach((wm, idx) => {
+      if (idx < vocabThreshold) {
+        return;
+      }
       const wl = Array.from(wm.entries()).sort(
         (i1, i2) => i2[1].count - i1[1].count
       );

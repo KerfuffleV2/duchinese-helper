@@ -16,6 +16,7 @@ interface ConfigKVs {
   fontWeight: number;
   fontFamilySimplified: string;
   fontFamilyTraditional: string;
+  vocabHskThreshold: number;
 }
 
 interface ConfigOption {
@@ -79,6 +80,7 @@ const defaultConfig: ConfigKVs = {
   fontWeight: 400,
   fontFamilySimplified: 'local:serif',
   fontFamilyTraditional: 'local:serif',
+  vocabHskThreshold: 1,
 };
 
 const fontFamilies = [
@@ -238,6 +240,10 @@ const configOptions: {[key: string]: ConfigOption} = {
       .filter(x => x.traditional === true)
       .map(x => `${x.typ}:${x.name}`),
   },
+  vocabHskThreshold: {
+    name: 'Vocabulary HSK threshold',
+    options: Array.from({length: 7}, (_, idx) => idx + 1),
+  },
 };
 
 function applyStyles(cfg: ConfigKVs) {
@@ -249,7 +255,6 @@ function applyStyles(cfg: ConfigKVs) {
     sel.setAttribute('id', 'dchelper-styles');
   }
 
-  console.log('CONFIG', cfg);
   const theme = themes[cfg.theme ?? 'dark'] ?? themes['dark'];
   const tonetheme = theme?.toneThemes?.[cfg.hanziToneColors];
   const origfontfamily =
