@@ -17,6 +17,7 @@ interface ConfigKVs {
   fontFamilySimplified: string;
   fontFamilyTraditional: string;
   vocabHskThreshold: number;
+  [key: string]: string | number | boolean | undefined;
 }
 
 interface ConfigOption {
@@ -246,161 +247,134 @@ const configOptions: {[key: string]: ConfigOption} = {
   },
 };
 
-function applyStyles(cfg: ConfigKVs) {
-  let sel = document.getElementById('dchelper-styles');
-  if (sel) {
-    sel.remove();
-  } else {
-    sel = document.createElement('style');
-    sel.setAttribute('id', 'dchelper-styles');
-  }
-
-  const theme = themes[cfg.theme ?? 'dark'] ?? themes['dark'];
-  const tonetheme = theme?.toneThemes?.[cfg.hanziToneColors];
-  const origfontfamily =
-    cfg[
-      cfg.hanziType === 'simplified'
-        ? 'fontFamilySimplified'
-        : 'fontFamilyTraditional'
-    ];
-  const fontfamily = origfontfamily.split(':')[1];
-  const annoOnlyHover = ['annotation', 'both'].includes(cfg.hintOnlyHover);
-  const tcOnlyHover = ['tonecolor', 'both'].includes(cfg.hintOnlyHover);
-  const tonestyles =
-    tonetheme?.tones
-      ?.map(
-        (v, idx) =>
-          `${
-            tcOnlyHover
-              ? `.dchchunk:hover .dchtone${idx} , #dchelper-vocab `
-              : ''
-          }.dchtone${idx} { color: ${v}; }`
-      )
-      .join('\n') ?? '';
-  const tonechangestyles = Object.entries(tonetheme?.toneChange ?? {})
-    .map(([k, v]) => `.dchtonechange${k} { ${v} }`)
-    .join('\n');
-  const annoNormal =
-    cfg.annoPosition === 'over' || cfg.annoPosition === 'under';
-  const annoVertical =
-    cfg.annoPosition === 'left-vertical' ||
-    cfg.annoPosition === 'right-vertical';
-
-  if (origfontfamily.startsWith('google:')) {
-    document.getElementById('dchelper-rstyles')?.remove();
-    const el = document.createElement('link');
-    el.setAttribute('id', 'dchelper-rstyles');
-    el.setAttribute('rel', 'stylesheet');
-    el.setAttribute(
-      'href',
-      `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-        fontfamily
-      )}`
-    );
-    document.head?.appendChild(el);
-  }
-
-  const style = `
-    .dchcontainer {
-      width: 100%;
-      font-size: 1.5em;
-      background-color: ${theme.backgroundColor};
-      border-radius: .5em;
-      border: ${theme.border};
-      padding: 1em;
-    }
-
-    .dchtext {
-      font-size: ${cfg.fontSize};
-      ${fontfamily !== 'default' ? `font-family: "${fontfamily}";` : ''}
-      font-weight: ${cfg.fontWeight};
-      padding-bottom: 1em;
-      padding-top: .5em;
-      color: ${theme.textColor};
-      text-rendering: optimizeLegibility;
-    }
-
-    #dchelper-config {
-      font-size: 1em;
-      font-family: sans-serif;
-    }
-
-    label.dchoptlabel {
-      font-size: 16pt;
-      line-height: 17pt;
-      font-weight: 600;
-      color: ${theme.textColor};
-      display: block;
-    }
-    .dchoptlabel select {
-      color: #ccc;
-      background-color: #101a1a;
-      font-size: 14pt;
-      line-height: 15pt;
-    }
-
-    #dchelper-audioplayer { height: 1em; }
-
-    #dchelper-vocab {
-      border-radius: .25em;
-      border: ${theme.border};
-      padding-left: 1em;
-      padding-right: 1em;
-      margin-top: .5em;
-      padding-top: 0;
-    }
-
-    ruby.dchword {
-      ${annoNormal ? `ruby-position: ${cfg.annoPosition};` : ''}
-      ruby-align: center;
-    }
-
-    ruby.dchword rt {
-      white-space: pre-wrap;
-      font-weight: 400;
-      font-family: monospace;
-      padding-left: 2pt;
-      padding-right: 2pt;
-      ${annoOnlyHover ? 'visibility: collapse;' : ''}
-    }
-    ${annoOnlyHover ? '.dchchunk:hover rt { visibility: visible; }' : ''}
-
-    .dchpad, .dchpadhint { white-space: pre-wrap; }
-
-    .dchactivesyl { ${theme.activeSyllable} }
-
-    .dchactiveword { ${theme.activeWord} }
-
-    .dchactivesent { ${theme.activeSentence} }
-
-    .dchchunk {
-      margin: 0;
-      padding: 0;
-      margin-bottom: .2em;
-      line-height: calc(${cfg.fontSize} + 4pt);
-    }
-    #dchsent0 { font-size: 135%; }
-    .dchsent:hover { ${theme.hoverSentence} }
-    .dchword:hover { ${theme.hoverWord} }
-    .dchsent:hover span.dchpadhint { ${theme.hoverSentenceHint} }
-    .dchsyl, .dchword, .dchsent {
-      transition: all 0.25s ease;
-      border-radius: .15em;
-    }
-    rt.dchsyl {
-      ${
-        annoVertical
-          ? 'writing-mode: vertical-rl; text-orientation: upright;'
-          : ''
-      }
-      ${annoNormal ? '' : 'display: inline;'}
-    }
-    ${tonestyles}
-    ${tonechangestyles}
-  `;
-
-  sel.textContent = style;
-  document.head?.append(sel);
+interface ConfigStore {
+  get(): ConfigKVs | undefined;
+  set(_cfg: ConfigKVs): void;
+  clear(): void;
 }
 
-export {applyStyles, ConfigKVs, ConfigOption, configOptions, defaultConfig};
+type GMGetter = (
+  _name: string
+) =>
+  | {[key: string]: string | number | boolean | object | null | undefined}
+  | undefined;
+type GMSetter = (_name: string, _val: ConfigKVs) => void;
+type GMDeleter = (_name: string) => void;
+class UserscriptConfigStore implements ConfigStore {
+  getter: GMGetter;
+  setter: GMSetter;
+  deleter: GMDeleter;
+  constructor(get: GMGetter, set: GMSetter, del: GMDeleter) {
+    this.getter = get;
+    this.setter = set;
+    this.deleter = del;
+  }
+  get(): ConfigKVs | undefined {
+    return this.getter('config') as ConfigKVs;
+  }
+  set(cfg: ConfigKVs): void {
+    this.setter('config', cfg);
+  }
+  clear(): void {
+    this.deleter('config');
+  }
+}
+
+class Config {
+  cfg: ConfigKVs;
+  private bus: EventTarget;
+  private store: ConfigStore;
+  element: HTMLElement;
+  constructor(bus: EventTarget, store: ConfigStore, cfg?: ConfigKVs) {
+    cfg = cfg ?? store.get() ?? defaultConfig;
+    for (const [k, v] of Object.entries(defaultConfig)) {
+      if (
+        v === undefined ||
+        configOptions[k]?.options.findIndex(i => i === v) < 0
+      ) {
+        cfg[k] = defaultConfig[k];
+      }
+    }
+    this.cfg = cfg;
+    this.bus = bus;
+    this.store = store;
+    this.element = this.initElement();
+  }
+
+  get<T extends string>(key: T): ConfigKVs[T] {
+    return this.cfg[key];
+  }
+
+  makeOption(name: string, option: ConfigOption) {
+    const el = document.createElement('label');
+    const sel = document.createElement('select');
+    sel.setAttribute('name', name);
+    const bus = this.bus;
+    sel.addEventListener('change', evt => {
+      if (!evt.target || !('value' in evt.target)) {
+        return;
+      }
+      this.cfg[name] = JSON.parse(evt.target.value as string);
+      bus.dispatchEvent(new CustomEvent('configupdate', {detail: this}));
+    });
+    el.appendChild(document.createTextNode(`${option.name ?? name}: `));
+    el.setAttribute('class', 'dchoptlabel');
+    for (const optval of option.options) {
+      const oel = document.createElement('option');
+      oel.setAttribute('value', JSON.stringify(optval));
+      const currval = this.cfg[name] ?? null;
+      if (currval === optval) {
+        oel.setAttribute('selected', '');
+      }
+      oel.appendChild(document.createTextNode(`${optval}`));
+      sel.appendChild(oel);
+    }
+    el.appendChild(sel);
+    return el;
+  }
+
+  initElement(): HTMLElement {
+    const el = document.createElement('div');
+    el.setAttribute('id', 'dchelper-config');
+    el.setAttribute('hidden', '');
+    for (const [ok, ov] of Object.entries(configOptions)) {
+      el.appendChild(this.makeOption(ok, ov));
+    }
+    const pel = document.createElement('p');
+    {
+      const lel = document.createElement('a');
+      lel.setAttribute('href', '#0');
+      lel.appendChild(document.createTextNode('[Save]'));
+      lel.addEventListener('click', _evt => {
+        this.store.set(this.cfg);
+        return false;
+      });
+      pel.appendChild(lel);
+      el.appendChild(pel);
+    }
+    pel.appendChild(document.createTextNode(' | '));
+    {
+      const lel = document.createElement('a');
+      lel.setAttribute('href', '#0');
+      lel.appendChild(document.createTextNode('[Clear]'));
+      lel.addEventListener('click', _evt => {
+        this.store.clear();
+        return false;
+      });
+      pel.appendChild(lel);
+    }
+    el.appendChild(pel);
+    return el;
+  }
+}
+
+export {
+  themes,
+  ConfigKVs,
+  ConfigOption,
+  configOptions,
+  defaultConfig,
+  Config,
+  ConfigStore,
+  UserscriptConfigStore,
+};

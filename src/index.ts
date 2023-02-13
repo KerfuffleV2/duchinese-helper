@@ -1,3 +1,3 @@
-import {initUserScript} from './duchinese-helper.userscript.js';
+import {initUserScript} from './userscript.js';
 
 initUserScript();
