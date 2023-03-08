@@ -10,16 +10,35 @@ function CRD(crdtext) {
   const spaceRe = /[\s'‘]+/;
   const toneMarkChars = ['\u0304', '\u0301', '\u030c', '\u0300'];
   const toneMap = new Map(toneMarkChars.map((tc, idx) => [tc, idx + 1]));
-  // ，、。：；“‘
+
   const punctFixup = new Map([
     ['，', ', '],
     ['、', ', '],
     ['。', '. '],
     ['：', ': '],
     ['；', '; '],
-    ['“', '"'],
+    ['“', ' "'],
+    ['”', '"'],
     ['‘', "'"],
+    ['！', '!'],
+    ['？', '?'],
   ]);
+  function fixPunct(s) {
+    if (s.length === 0) {
+      return s;
+    }
+    let mc = 0;
+    const out = Array.from(s)
+        .map(c => {
+          const replacement = punctFixup.get(c);
+          return replacement !== undefined ? (mc++, replacement) : s;
+        })
+        .join(''),
+      lastc = out[out.length - 1];
+    return mc > 0 && s[s.length - 1] !== '“' && lastc !== "'"
+      ? out.concat(' ')
+      : out;
+  }
 
   me.crd = JSON.parse(crdtext);
   if (unsafeWindow) {
@@ -194,11 +213,9 @@ function CRD(crdtext) {
         },
         [{typ: 'h3', children: 'Pinyin'}]
       );
-    let pinchunk = mkElementTree('p', {class: 'dchchunk'}),
-      transchunk = mkElementTree('p', {class: 'dchchunk'}),
+    let pinchunk = null,
+      transchunk = null,
       plastword = false;
-    transdiv.appendChild(transchunk);
-    pindiv.appendChild(pinchunk);
     const el = currEl ?? document.createElement('div');
     el.innerHTML = '';
     el.setAttribute('class', 'dchtext');
@@ -229,7 +246,7 @@ function CRD(crdtext) {
       if (transel === null) {
         const trans = (me.crd.sentence_translations[lsentence] ?? '').trim();
         if (trans.length > 0) {
-          transchunk.appendChild(document.createTextNode(` ${trans}`));
+          transchunk?.appendChild(document.createTextNode(` ${trans}`));
           transel = mkElementTree(
             'span',
             {class: 'dchpadhint', title: trans},
@@ -277,9 +294,9 @@ function CRD(crdtext) {
       }
       if (!phon) {
         wel = null;
-        plastword = false;
-        pinchunk.appendChild(
-          document.createTextNode(punctFixup.get(raw) ?? raw)
+        plastword = sycount > 0 || !!sy;
+        pinchunk?.appendChild(
+          document.createTextNode(`${plastword ? ' ' : ''}${fixPunct(raw)}`)
         );
         const oel = mkElementTree('span', {class: 'dchother'}, raw);
         sel.appendChild(oel);
@@ -302,11 +319,12 @@ function CRD(crdtext) {
         wel.setAttribute('class', 'dchword');
         const currword = me.crd.words[word] ?? {};
         if (currword.meaning) {
-          if (plastword) {
-            pinchunk.appendChild(document.createTextNode(' '));
-          }
-          pinchunk.appendChild(
-            document.createTextNode(currword.pinyin?.replaceAll(' ', '') ?? '')
+          pinchunk?.appendChild(
+            document.createTextNode(
+              `${plastword ? ' ' : ''}${
+                currword.pinyin?.replaceAll(' ', '') ?? ''
+              }`
+            )
           );
           plastword = true;
           wel.setAttribute(
