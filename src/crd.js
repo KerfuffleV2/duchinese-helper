@@ -320,7 +320,18 @@ function CRD(crdtext) {
         const currword = me.crd.words[word] ?? {};
         if (currword.meaning) {
           pinchunk?.appendChild(
-            document.createTextNode(
+            mkElementTree(
+              'span',
+              {
+                class: 'dchword',
+                title: `${
+                  simplified
+                    ? currword.hanzi
+                    : currword.tc_hanzi ?? currword.hanzi
+                }${currword.hsk > 0 ? ` (HSK${currword.hsk})` : ''}\n${
+                  currword.meaning ?? ''
+                }`,
+              },
               `${plastword ? ' ' : ''}${
                 currword.pinyin?.replaceAll(' ', '') ?? ''
               }`
