@@ -101,7 +101,25 @@ function applyStyles(cfg: ConfigKVs) {
       padding-left: 1em;
       padding-right: 1em;
       margin-top: .5em;
-      padding-top: 0;
+      margin-bottom: 1em;
+      padding-top: 0px;
+    }
+
+    #dchelper-vocab table {
+      margin-top: 1.5em;
+      border-collapse: collapse;
+      border: ${theme.borderSmall};
+      letter-spacing: 1px;
+      font-family: sans-serif;
+      font-size: 0.8em;
+    }
+    #dchelper-vocab td, #dchelper-vocab th {
+      border: ${theme.borderSmall};
+      padding: 4px;
+      white-space: nowrap;
+    }
+    #dchelper-vocab td.dch-vocabdef {
+      white-space: normal;
     }
 
     ruby.dchword {

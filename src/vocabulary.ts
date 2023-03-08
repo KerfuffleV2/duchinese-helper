@@ -31,8 +31,10 @@ interface VocabWord {
   count: number;
 }
 
+type VocabWordMap = Map<string, VocabWord>;
+
 class Vocabulary {
-  hskWords: Array<Map<string, VocabWord>>;
+  hskWords: Array<VocabWordMap>;
   uniqueWordCount: number;
   hskWordCount: number;
   wordCount: number;
@@ -189,7 +191,9 @@ class Vocabulary {
       }
     }
     const vocabThreshold = (configuration.get('vocabHskThreshold') ?? 1) - 1;
-    this.hskWords.forEach((wm, idx) => {
+    const verbose = configuration.get('vocabVerbose') ?? false;
+
+    function buildBrief(wm: VocabWordMap, idx: number) {
       if (idx < vocabThreshold) {
         return;
       }
@@ -240,7 +244,118 @@ class Vocabulary {
         lel.appendChild(wel);
       }
       el.appendChild(lel);
-    });
+    }
+
+    function buildVerbose(tel: HTMLElement, wm: VocabWordMap, idx: number) {
+      if (idx < vocabThreshold) {
+        return;
+      }
+      const wl = Array.from(wm.entries()).sort(
+        (i1, i2) => i2[1].count - i1[1].count
+      );
+      const catname = mkCatName(idx);
+      tel.appendChild(
+        mkElementTree('tr', null, [
+          {
+            typ: 'th',
+            children: catname,
+          },
+          {
+            typ: 'th',
+            attrs: {colspan: '4'},
+            children: `${wl.length} (total)`,
+          },
+        ])
+      );
+
+      for (const [_szi, word] of wl) {
+        const pinyin = word.word.pinyin ?? '',
+          meaning = word.word.meaning ?? '';
+
+        const rel = mkElementTree('tr', null, [
+          {
+            typ: 'td',
+            children: catname,
+          },
+          {
+            typ: 'td',
+            children: word.count.toString(),
+          },
+          {
+            typ: 'td',
+            children: word.syls.map(syl => {
+              return {
+                typ: 'span',
+                attrs: {class: `dchsyl dchtone${syl.tone ?? 5}`},
+                children: syl[zityp],
+              };
+            }),
+          },
+          {
+            typ: 'td',
+            children: pinyin,
+          },
+          {
+            typ: 'td',
+            attrs: {class: 'dch-vocabdef'},
+            children: meaning?.replaceAll('\n', ' ❙ '),
+          },
+        ]);
+
+        const stime = word.syls[0]?.syltime?.start ?? null;
+        let etime = 0;
+        if (clipael && stime) {
+          for (const syl of word.syls) {
+            if (syl.syltime?.start) {
+              etime = Math.max(etime, syl.syltime?.end ?? clipael.duration);
+            }
+          }
+          rel.addEventListener('click', evt => {
+            playclip(stime, etime - stime);
+            evt.stopPropagation();
+          });
+        }
+
+        tel.appendChild(rel);
+      }
+    }
+
+    if (verbose) {
+      const tel = mkElementTree('table', null, [
+        {
+          typ: 'thead',
+          children: [
+            {
+              typ: 'th',
+              children: 'Type',
+            },
+            {
+              typ: 'th',
+              children: '#',
+            },
+            {
+              typ: 'th',
+              children: '字',
+            },
+            {
+              typ: 'th',
+              children: '拼音',
+            },
+            {
+              typ: 'th',
+              children: 'Meaning',
+            },
+          ],
+        },
+      ]);
+      const tbody = document.createElement('tbody');
+      tel.appendChild(tbody);
+      this.hskWords.forEach((wm, idx) => buildVerbose(tbody, wm, idx));
+      el.appendChild(tel);
+    } else {
+      this.hskWords.forEach(buildBrief);
+    }
+
     this.el = el;
     return el;
   }

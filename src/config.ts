@@ -17,17 +17,19 @@ interface ConfigKVs {
   fontFamilySimplified: string;
   fontFamilyTraditional: string;
   vocabHskThreshold: number;
+  vocabVerbose: boolean;
   [key: string]: string | number | boolean | undefined;
 }
 
 interface ConfigOption {
   name: string;
-  options: Array<string | number>;
+  options: Array<string | number | boolean>;
 }
 
 interface Theme {
   backgroundColor: string;
   border: string;
+  borderSmall: string;
   textColor: string;
   activeSyllable: string;
   activeWord: string;
@@ -82,6 +84,7 @@ const defaultConfig: ConfigKVs = {
   fontFamilySimplified: 'local:serif',
   fontFamilyTraditional: 'local:serif',
   vocabHskThreshold: 1,
+  vocabVerbose: false,
 };
 
 const fontFamilies = [
@@ -105,6 +108,7 @@ const themes: {[key: string]: Theme} = {
   dark: {
     backgroundColor: '#001b26',
     border: '3px inset #204b56',
+    borderSmall: '1px solid #404b56',
     textColor: '#bbb',
     activeSyllable: 'background-color: rgba(100,150,150,0.4);',
     activeWord: 'background-color: rgba(100,150,150,0.3);',
@@ -140,6 +144,7 @@ const themes: {[key: string]: Theme} = {
   light: {
     backgroundColor: '#f9f9f9',
     border: '2px inset #a0d0d0',
+    borderSmall: '1px solid #80a0a0',
     textColor: 'inherit',
     activeSyllable: 'background-color: rgba(150,150,150,0.4);',
     activeWord: 'background-color: rgba(150,150,150,0.3);',
@@ -245,6 +250,10 @@ const configOptions: {[key: string]: ConfigOption} = {
     name: 'Vocabulary HSK threshold',
     options: Array.from({length: 7}, (_, idx) => idx + 1),
   },
+  vocabVerbose: {
+    name: 'Use verbose vocabulary format',
+    options: [true, false],
+  },
 };
 
 interface ConfigStore {
@@ -322,7 +331,7 @@ class Config {
     for (const optval of option.options) {
       const oel = document.createElement('option');
       oel.setAttribute('value', JSON.stringify(optval));
-      const currval = this.cfg[name] ?? null;
+      const currval = this.cfg[name] ?? defaultConfig[name] ?? null;
       if (currval === optval) {
         oel.setAttribute('selected', '');
       }
