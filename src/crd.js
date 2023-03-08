@@ -201,7 +201,7 @@ function CRD(crdtext) {
           transel = mkElementTree(
             'span',
             {class: 'dchpadhint', title: trans},
-            ' '
+            '   '
           );
         } else {
           transel = undefined;

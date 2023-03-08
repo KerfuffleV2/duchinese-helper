@@ -1,6 +1,7 @@
 interface ConfigKVs {
   theme: string;
   hanziType: string;
+  wordSpacing: boolean;
   hanziToneColors: string;
   hanziToneColorThreshold: number;
   sandhiHints: string;
@@ -68,6 +69,7 @@ class FontFamily {
 const defaultConfig: ConfigKVs = {
   theme: 'dark',
   hanziType: 'simplified',
+  wordSpacing: false,
   hanziToneColors: 'vivid',
   hanziToneColorThreshold: 0,
   sandhiHints: 'on',
@@ -174,6 +176,7 @@ const themes: {[key: string]: Theme} = {
 const configOptions: {[key: string]: ConfigOption} = {
   theme: {name: 'Theme', options: ['dark', 'light']},
   hanziType: {name: 'Characters', options: ['simplified', 'traditional']},
+  wordSpacing: {name: 'Show spaces between words', options: [true, false]},
   hanziToneColors: {name: 'Tone colors', options: ['off', 'vivid', 'pastel']},
   hanziToneColorThreshold: {
     name: 'Tone color HSK level threshold',

@@ -39,6 +39,7 @@ function applyStyles(cfg: ConfigKVs) {
   const annoVertical =
     cfg.annoPosition === 'left-vertical' ||
     cfg.annoPosition === 'right-vertical';
+  const wordSpacing = cfg.wordSpacing ?? false;
 
   if (origfontfamily.startsWith('google:')) {
     document.getElementById('dchelper-rstyles')?.remove();
@@ -137,7 +138,10 @@ function applyStyles(cfg: ConfigKVs) {
     }
     ${annoOnlyHover ? '.dchchunk:hover rt { visibility: visible; }' : ''}
 
+    ${wordSpacing ? '.dchword + .dchword { padding-left: .3em; }' : ''}
+
     .dchpad, .dchpadhint { white-space: pre-wrap; }
+    .dchpadhint { width: 16pxm; min-width: 16px; }
 
     .dchactivesyl { ${theme.activeSyllable} }
 
