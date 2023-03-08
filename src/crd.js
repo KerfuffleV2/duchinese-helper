@@ -10,6 +10,16 @@ function CRD(crdtext) {
   const spaceRe = /[\s'‘]+/;
   const toneMarkChars = ['\u0304', '\u0301', '\u030c', '\u0300'];
   const toneMap = new Map(toneMarkChars.map((tc, idx) => [tc, idx + 1]));
+  // ，、。：；“‘
+  const punctFixup = new Map([
+    ['，', ', '],
+    ['、', ', '],
+    ['。', '. '],
+    ['：', ': '],
+    ['；', '; '],
+    ['“', '"'],
+    ['‘', "'"],
+  ]);
 
   me.crd = JSON.parse(crdtext);
   if (unsafeWindow) {
@@ -168,6 +178,27 @@ function CRD(crdtext) {
     const annoPosLeft =
       annoPos && (annoPos === 'left' || annoPos === 'left-vertical');
 
+    const transdiv = mkElementTree(
+        'div',
+        {
+          id: 'dchelper-translationtext',
+          hidden: '',
+        },
+        [{typ: 'h3', children: 'Translation'}]
+      ),
+      pindiv = mkElementTree(
+        'div',
+        {
+          id: 'dchelper-pinyintext',
+          hidden: '',
+        },
+        [{typ: 'h3', children: 'Pinyin'}]
+      );
+    let pinchunk = mkElementTree('p', {class: 'dchchunk'}),
+      transchunk = mkElementTree('p', {class: 'dchchunk'}),
+      plastword = false;
+    transdiv.appendChild(transchunk);
+    pindiv.appendChild(pinchunk);
     const el = currEl ?? document.createElement('div');
     el.innerHTML = '';
     el.setAttribute('class', 'dchtext');
@@ -198,6 +229,7 @@ function CRD(crdtext) {
       if (transel === null) {
         const trans = (me.crd.sentence_translations[lsentence] ?? '').trim();
         if (trans.length > 0) {
+          transchunk.appendChild(document.createTextNode(` ${trans}`));
           transel = mkElementTree(
             'span',
             {class: 'dchpadhint', title: trans},
@@ -208,6 +240,11 @@ function CRD(crdtext) {
         }
       }
       if (chunk !== lchunk) {
+        plastword = false;
+        pinchunk = mkElementTree('p', {class: 'dchchunk'});
+        transchunk = mkElementTree('p', {class: 'dchchunk'});
+        transdiv.appendChild(transchunk);
+        pindiv.appendChild(pinchunk);
         lchunk = chunk;
         cel = mkElementTree(
           'p',
@@ -240,6 +277,10 @@ function CRD(crdtext) {
       }
       if (!phon) {
         wel = null;
+        plastword = false;
+        pinchunk.appendChild(
+          document.createTextNode(punctFixup.get(raw) ?? raw)
+        );
         const oel = mkElementTree('span', {class: 'dchother'}, raw);
         sel.appendChild(oel);
         if (sy) {
@@ -261,6 +302,13 @@ function CRD(crdtext) {
         wel.setAttribute('class', 'dchword');
         const currword = me.crd.words[word] ?? {};
         if (currword.meaning) {
+          if (plastword) {
+            pinchunk.appendChild(document.createTextNode(' '));
+          }
+          pinchunk.appendChild(
+            document.createTextNode(currword.pinyin?.replaceAll(' ', '') ?? '')
+          );
+          plastword = true;
           wel.setAttribute(
             'title',
             `${currword.pinyin}${
@@ -355,6 +403,8 @@ function CRD(crdtext) {
       transel = null;
     }
     me.tracker = new TrackPlayback(syels, me.crd.syllable_times);
+    el.appendChild(pindiv);
+    el.appendChild(transdiv);
     return el;
   };
 }

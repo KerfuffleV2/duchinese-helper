@@ -261,16 +261,33 @@ function DCHelper(name, audio, crd) {
       });
       docChunk.appendChild(el);
     }
+
     {
       addSep();
       const el = mkElementTree(
         'a',
-        {href: '#0', title: 'Toggle story visibility'},
+        {href: '#0', title: 'Toggle pinyin visibility'},
         '👀'
       );
       el.addEventListener('click', _evt => {
         document
-          .getElementById('dchelper-storytext')
+          .getElementById('dchelper-pinyintext')
+          ?.toggleAttribute('hidden');
+        return false;
+      });
+      docChunk.appendChild(el);
+    }
+
+    {
+      addSep();
+      const el = mkElementTree(
+        'a',
+        {href: '#0', title: 'Toggle translation visibility'},
+        '📜'
+      );
+      el.addEventListener('click', _evt => {
+        document
+          .getElementById('dchelper-translationtext')
           ?.toggleAttribute('hidden');
         return false;
       });

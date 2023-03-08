@@ -96,6 +96,20 @@ function applyStyles(cfg: ConfigKVs) {
 
     #dchelper-audioplayer { height: 1em; }
 
+    #dchelper-translationtext, #dchelper-pinyintext {
+      color: ${theme.textColor};
+      padding-bottom: .5em;
+      padding-top: .5em;
+      font-size: 16pt;
+      font-weight: normal;
+      font-family: serif;
+      font-style: normal;
+    }
+
+    #dchelper-pinyintext {
+      font-family: sans-serif;
+    }
+
     #dchelper-vocab {
       border-radius: .25em;
       border: ${theme.border};
