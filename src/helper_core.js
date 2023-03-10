@@ -1,20 +1,3 @@
-// ==UserScript==
-// @name        DC Helper
-// @namespace   Violentmonkey Scripts
-// @match       https://duchinese.net/*
-// @version     0.6
-// @run-at      document-start
-// @inject-into page
-// @grant       GM_setClipboard
-// @grant       GM_registerMenuCommand
-// @grant       GM_setValue
-// @grant       GM_getValue
-// @grant       GM_deleteValue
-// @grant       GM_addValueChangeListener
-// @author      KerfuffleV2
-// @description Unsupported extensions for DuChinese
-// ==/UserScript==
-
 import {configuration, bus} from './globals.ts';
 import {mkElementTree} from './util.ts';
 import {applyStyles} from './styles.ts';

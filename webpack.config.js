@@ -24,4 +24,13 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  optimization: {
+    concatenateModules: true,
+    innerGraph: true,
+    removeAvailableModules: true,
+    usedExports: true,
+  },
+  cache: {
+    type: 'filesystem',
+  },
 };

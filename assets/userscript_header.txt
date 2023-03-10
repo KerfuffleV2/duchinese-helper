@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name        DC Helper
-// @namespace   Violentmonkey Scripts
+// @namespace   https://github.com/KerfuffleV2/
 // @match       https://duchinese.net/*
 // @match       https://www.duchinese.net/*
-// @version     0.6
+// @version     UNKNOWNVERSION
 // @run-at      document-start
 // @inject-into page
 // @grant       GM_setClipboard
@@ -13,5 +13,5 @@
 // @grant       GM_deleteValue
 // @grant       GM_addValueChangeListener
 // @author      KerfuffleV2
-// @description Unsupported extensions for DuChinese
+// @description Unofficial extensions for DuChinese (Mandarin Chinese learning site)
 // ==/UserScript==
