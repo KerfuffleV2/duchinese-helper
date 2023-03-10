@@ -46,7 +46,7 @@ The annotation position can also be set to appear before, after, above or below 
 
 ##### Tone Color
 
-Characters can be colored based on the tone of the syllable. 
+Characters can be colored based on the tone of the syllable.
 
 ##### Sandhi
 
@@ -69,7 +69,8 @@ You can copy the text of the lesson to clipboard.
 ## Interface
 
 * ⚙️ — Toggle configuration section visibility.
-* 👀 — Toggle lesson text visibility.
+* 👀 — Toggle pinyin section visibility.
+* 📜 — Toggle translation section visibility.
 * 💬 — Copy lesson text to clipboard.
 * 📚 — Toggle vocabulary section visibility.
 
@@ -109,8 +110,16 @@ I wouldn't go that far, but DuChinese is aware of it, had access to the source a
 
 ### Is There Tracking/Monetization
 
-None of the code I wrote does or will do anything like that. There is one small external dependency which is used to provide some functions. I verified that it doesn't do anything sinister, but I also can't control other people. It's unlikely to ever be a problem, but just saying "No" here technically wouldn't be 100% true.
+None of the code I wrote does or will do anything like that.
 
-### Oh No I Saw The Word Spy
+## Building
 
-Don't worry, this doesn't mean you're being spied on or tracked. The extension uses a third party library (mentioned above) called `xspy` which allows a script to watch what requests occur _only in its own window_. This is only used to collect the lesson content when the main site requests it. 
+You will need a recent version of Node and NPM available. Describing how to get to that point is beyond the scope of this document.
+
+On a Unix-type system, you can just use the `Makefile`
+
+* Running `make` (or `make build-dev`) should generate the development, unminimized version of the userscript in `dist/duchinese-helper.userscript.js`
+
+* Running `make build-prod` should create the minimized version of the userscript in `dist/duchinese-helper.min.userscript.js`
+
+If you want, you can run `npm` yourself. `npm run compile` or `npm run compile-prod` (for minimized) will generate `dist/bundle.js`. This will need to be manually combined with the userscript header in `assets/userscript_header.txt`
