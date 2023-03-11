@@ -137,12 +137,12 @@ function applyStyles(cfg: ConfigKVs) {
       white-space: normal;
     }
 
-    ruby.dchword {
+    .dchword {
       ${annoNormal ? `ruby-position: ${cfg.annoPosition};` : ''}
       ruby-align: center;
     }
 
-    ruby.dchword rt {
+    .dchword rt {
       white-space: pre-wrap;
       font-weight: 400;
       font-family: monospace;
@@ -177,7 +177,7 @@ function applyStyles(cfg: ConfigKVs) {
       transition: all 0.25s ease;
       border-radius: .15em;
     }
-    rt.dchsyl {
+    .dchsyl {
       ${
         annoVertical
           ? 'writing-mode: vertical-rl; text-orientation: upright;'
