@@ -1,5 +1,5 @@
 DEPS=$(wildcard src/*.js src/*.ts ./asserts/userscript_header.txt ./package.json ./package-lock.json ./tsconfig.json ./webpack.config.js)
-VERSION=$(shell ( ( git describe --exact-match --tags || ( git symbolic-ref --short HEAD  && git log --date=format:%y%m%d_%H%M --pretty=format:%h_%cd -1 ) || echo -n UNKNOWN ) | tr '\n' '-' ) 2>/dev/null )
+VERSION=$(shell ( ( git describe --exact-match --tags || ( git symbolic-ref --short HEAD  && git log --date=format:%y%m%d_%H%M --pretty=format:%h_%cd -1 ) || echo -n UNKNOWN ) | tr '\n' '-' | sed 's@-$@@' ) 2>/dev/null )
 
 .DEFAULT_TARGET: all
 
